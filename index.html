@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulador de Máquina de Estados - Transacción Electrónica</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
+    h1 { text-align: center; color: #2c3e50; }
+    .state-box { border: 2px solid #2c3e50; border-radius: 10px; padding: 15px; margin-top: 20px; background: #fff; }
+    .buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    button { padding: 10px 15px; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; }
+    .log { margin-top: 20px; background: #eef; padding: 10px; border-radius: 5px; height: 150px; overflow-y: auto; }
+    .final { color: green; font-weight: bold; }
+    .error { color: red; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>⚖️ Máquina de Estado Finita - Transacción Electrónica</h1>
+
+  <div class="state-box">
+    <h2>Estado actual: <span id="estado">S0 - Inicio</span></h2>
+    <div class="buttons">
+      <button onclick="transitar('iniciar')">Iniciar sesión</button>
+      <button onclick="transitar('validar')">Validar identidad</button>
+      <button onclick="transitar('pagar')">Solicitar pago</button>
+      <button onclick="transitar('enviar_tienda')">Enviar a tienda</button>
+      <button onclick="transitar('verificar')">Verificar fondos</button>
+      <button onclick="transitar('autorizar')">Autorizar</button>
+      <button onclick="transitar('cancelar')">Cancelar</button>
+      <button onclick="transitar('entregar')">Entregar producto</button>
+      <button onclick="transitar('liberar')">Liberar fondos</button>
+      <button onclick="transitar('transferir')">Transferir</button>
+      <button onclick="transitar('confirmar')">Confirmar transferencia</button>
+    </div>
+    <div class="log" id="log"></div>
+  </div>
+
+  <script>
+    let estado = 'S0';
+    const log = document.getElementById('log');
+
+    const transiciones = {
+      'S0': { iniciar: 'S1' },
+      'S1': { validar: 'S2' },
+      'S2': { pagar: 'S3' },
+      'S3': { enviar_tienda: 'S4' },
+      'S4': { verificar: 'S5' },
+      'S5': { autorizar: 'S7', cancelar: 'S6' },
+      'S7': { entregar: 'S8' },
+      'S8': { liberar: 'S9' },
+      'S9': { transferir: 'S10' },
+      'S10': { confirmar: 'S11' }
+    };
+
+    const nombres = {
+      'S0': 'S0 - Inicio',
+      'S1': 'S1 - Sesión iniciada',
+      'S2': 'S2 - Identidad validada',
+      'S3': 'S3 - Pago solicitado',
+      'S4': 'S4 - Enviado a tienda',
+      'S5': 'S5 - Verificando fondos',
+      'S6': 'S6 - Cancelado por cliente',
+      'S7': 'S7 - Autorizado por banco',
+      'S8': 'S8 - Producto entregado',
+      'S9': 'S9 - Fondos solicitados',
+      'S10': 'S10 - Transferencia en proceso',
+      'S11': 'S11 - Transacción finalizada',
+      'ERROR': 'ERROR - Acción inválida'
+    };
+
+    function transitar(accion) {
+      if (transiciones[estado] && transiciones[estado][accion]) {
+        const anterior = estado;
+        estado = transiciones[estado][accion];
+        document.getElementById('estado').textContent = nombres[estado];
+        log.innerHTML += ✔️ Transición: ${nombres[anterior]} ➜ ${nombres[estado]}<br>;
+      } else {
+        estado = 'ERROR';
+        document.getElementById('estado').textContent = nombres[estado];
+        log.innerHTML += <span class='error'>❌ Acción inválida desde el estado actual.</span><br>;
+      }
+      log.scrollTop = log.scrollHeight;
+    }
+  </script>
+</body>
+</html>
